@@ -1,0 +1,11 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "isCreatingSolution": false,
+    "environment": "spo",
+    "version": "1.7.1",
+    "libraryName": "ms-graph-client-demo",
+    "libraryId": "2cda0703-f7b0-46f8-9b10-1430036cb53f",
+    "packageManager": "npm",
+    "componentType": "webpart"
+  }
+}

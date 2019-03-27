@@ -1,0 +1,27 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "get-unread-emails-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/getUnreadEmails/GetUnreadEmailsWebPart.js",
+          "manifest": "./src/webparts/getUnreadEmails/GetUnreadEmailsWebPart.manifest.json"
+        }
+      ]
+    },
+    "ms-teams-handler-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/msTeamsHandler/MsTeamsHandlerWebPart.js",
+          "manifest": "./src/webparts/msTeamsHandler/MsTeamsHandlerWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "GetUnreadEmailsWebPartStrings": "lib/webparts/getUnreadEmails/loc/{locale}.js",
+    "MsTeamsHandlerWebPartStrings": "lib/webparts/msTeamsHandler/loc/{locale}.js"
+  }
+}
