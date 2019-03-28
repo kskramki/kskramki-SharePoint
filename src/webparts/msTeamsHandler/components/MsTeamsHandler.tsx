@@ -25,25 +25,25 @@ this.getUsers = this.getUsers.bind(this);
 public componentDidMount ()
 {
 //Joine Group  need User.ReadWrite.All permision
-  this.props.client.api("/users/49ba6e73-6df7-441b-98be-8cd747f2c631/joinedTeams").get().then(response=>{
-    console.log(response);
-  });
+ // this.props.client.api("/users/49ba6e73-6df7-441b-98be-8cd747f2c631/joinedTeams").get().then(response=>{
+ ////   console.log("Joined Team :",response);
+ // });
   
  //this.props.client.api("/teams").version("beta").post(content,this.SuccessFailureCallBack);
  
  //this.props.client.api("/groups?$select=id,resourceProvisioningOptions").get(this.SuccessFailureCallBack);
  //need User.ReadBasic.All
 this.props.client.api("/users/").get().then(response=>{
-  console.log(response)
+ // console.log(response)
   if(response['@odata.nextLink']!=null)
   {
     this.getUsers(response['@odata.nextLink'])
   }
 }
   );
-   
+  //Get all groups in the tenant
  this.props.client.api("/groups").get().then(response=>{
-console.log(response)
+//console.log(response)
 var groups: Array<IGroupItem> = new Array<IGroupItem>();
 response.value.map(((item:any)=>{
   groups.push({displayName:item.displayName,id:item.id});
@@ -61,7 +61,7 @@ this.setState(
 private getUsers(nexturl:string):void
 {
   this.props.client.api(nexturl).get().then(response=>{
-console.log(response)
+//console.log(response)
 if(response['@odata.nextLink']!=null)
   {
     this.getUsers(response['@odata.nextLink']);
@@ -107,15 +107,15 @@ console.log(content);
         name: 'Group Display name',
         fieldName: 'displayName',
         minWidth: 50,
-        maxWidth: 100,
+        maxWidth: 150,
         isResizable: true
       },
       {
         key: 'id',
         name: 'ID',
         fieldName: 'id',
-        minWidth: 50,
-        maxWidth: 100,
+        minWidth: 150,
+        maxWidth: 250,
         isResizable: true
       },
      
