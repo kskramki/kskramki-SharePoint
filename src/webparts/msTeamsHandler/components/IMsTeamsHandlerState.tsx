@@ -6,6 +6,6 @@ Teamstitle :string;
 groups:Array<IGroupItem>;
 doptions:Array<any>;
 users:Array<any>;
-selectedGroup:string | number;
-selectedUser:string | number;
+//selectedGroup:string | number;
+//selectedUser:string | number;
 }

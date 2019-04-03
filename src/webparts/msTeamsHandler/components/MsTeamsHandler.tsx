@@ -5,13 +5,15 @@ import {IMsTeamsHandlerState} from './IMsTeamsHandlerState';
 import { escape } from '@microsoft/sp-lodash-subset';
 import { AadHttpClientFactory } from '@microsoft/sp-http';
 import { IGroupItem,IUserItem } from './IGroupItem';
-import {DetailsList,  DetailsListLayoutMode,CheckboxVisibility,SelectionMode,Dropdown,DropdownMenuItemType,IDropdownOption} from 'office-ui-fabric-react'
+import {DetailsList,  DetailsListLayoutMode,CheckboxVisibility,SelectionMode,Dropdown,DropdownMenuItemType,IDropdownOption} from 'office-ui-fabric-react';
 
 // const dropdownStyles: Partial<IDropdownStyles> = {
 //   dropdown: { width: 300 }
 // };
-var dpoptions :Array<IDropdownOption> = new Array<IDropdownOption>();
+//var dpoptions :Array<IDropdownOption> = new Array<IDropdownOption>();
 var officeUsers: Array<IDropdownOption> = new Array<IDropdownOption>();
+var selectedGroup :string |Number =null;
+var selectedUser :string| Number=null;
 export default class MsTeamsHandler extends React.Component<IMsTeamsHandlerProps, IMsTeamsHandlerState> {
 //Constructor
   public constructor(props)
@@ -21,14 +23,15 @@ export default class MsTeamsHandler extends React.Component<IMsTeamsHandlerProps
   Teamstitle:"",
   groups:[],
   doptions:[],
- users:[],
- selectedGroup:'',
- selectedUser:''
+ users:[]
+ 
 
 
 };
 this.handleChange = this.handleChange.bind(this);
 this.CreateTeam =this.CreateTeam.bind(this);
+this.getGroupHavingTeams =this.getGroupHavingTeams.bind(this);
+this.AddMember =this.AddMember.bind(this);
 this.getUsers = this.getUsers.bind(this);
 this._onChange = this._onChange.bind(this);
 this._onUserNameChange = this._onUserNameChange.bind(this);
@@ -44,38 +47,22 @@ public componentDidMount ()
   
  //this.props.client.api("/teams").version("beta").post(content,this.SuccessFailureCallBack);
  
- //this.props.client.api("/groups?$select=id,resourceProvisioningOptions").get(this.SuccessFailureCallBack);
+ 
  //need User.ReadBasic.All
 this.props.client.api("/users/").get().then(response=>{
   console.log(response);
- response.value.map((item:any)=>{officeUsers.push({key:item.id,text:item.displayName})})
+ response.value.map((item:any)=>{officeUsers.push({key:item.id,text:item.displayName});});
   if(response['@odata.nextLink']!=null)
   {
-    this.getUsers(response['@odata.nextLink'])
+    this.getUsers(response['@odata.nextLink']);
   }
 this.setState({
   users:officeUsers
-})
+});
 }
   );
-  //Get all groups in the tenant which is having Teams in group.
-  //V1.0 - /groups?$select=id,resourceProvisioningOptions
- this.props.client.api("/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team')").version('beta').get().then(response=>{
-//console.log(response)
-var groups: Array<IGroupItem> = new Array<IGroupItem>();
-var dpoptions :Array<IDropdownOption> = new Array<IDropdownOption>();
-response.value.map(((item:any)=>{
-  groups.push({displayName:item.displayName,id:item.id});
-  dpoptions.push({key:item.id,text:item.displayName})
-}))
-this.setState(
-  {
-    groups: groups,
-    doptions:dpoptions
-  }
-); 
-});
- 
+  
+  this.getGroupHavingTeams();
 }
 
 
@@ -84,22 +71,52 @@ private getUsers(nexturl:string):void
 {
   this.props.client.api(nexturl).get().then(response=>{
 //console.log(response)
-response.value.map((item:any)=>{officeUsers.push({key:item.id,text:item.displayName})})
+response.value.map((item:any)=>{officeUsers.push({key:item.id,text:item.displayName});});
 if(response['@odata.nextLink']!=null)
   {
     this.getUsers(response['@odata.nextLink']);
   }
 });
+// this.setState({
+//   users:officeUsers
+// });
 }
 
+//Get all groups in the tenant which is having Teams in group.
+  //V1.0 - /groups?$select=id,resourceProvisioningOptions
+//this.props.client.api("/groups?$select=id,resourceProvisioningOptions").get(this.SuccessFailureCallBack);
+  private getGroupHavingTeams():void
+  {
+  this.props.client.api("/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team')").version('beta').get().then(response=>{
+    //console.log(response)
+    var groups: Array<IGroupItem> = new Array<IGroupItem>();
+    var dpoptions :Array<IDropdownOption> = new Array<IDropdownOption>();
+    response.value.map(((item:any)=>{
+      groups.push({displayName:item.displayName,id:item.id});
+      dpoptions.push({key:item.id,text:item.displayName});
+    }));
+    this.setState(
+      {
+        groups: groups,
+        doptions:dpoptions
+      }
+    ); 
+    });
+  }
 private SuccessFailureCallBack(err:any,response:any,rawresponse?:any)
 {
  // console.log("First : ",err ,"Second ",response,"thirs", rawresponse);
   if(rawresponse!=null && rawresponse.status =="202")
-  alert("Created Succesfully")
+  alert("Created Succesfully");
   else{
-    console.log("Error:", err, "Response :" ,response, "Rawresponse",rawresponse )
-    alert("Erro:Please chec the console")
+    console.log("Error:", err, "Response :" ,response, "Rawresponse",rawresponse );
+    alert("Error:Please check the console");
+  }
+  if(rawresponse!=null && rawresponse.status =="204")
+  alert("Successfully Added");
+  else{
+    console.log("Error:", err, "Response :" ,response, "Rawresponse",rawresponse );
+    alert("Error:Please check the console");
   }
 }
 
@@ -123,22 +140,33 @@ private handleChange(event):void  {
 
 console.log(content);
 }
+
+//Add member into the Teams
+private AddMember() {
+  console.log("Group" + selectedGroup , "User", selectedUser);
+  if(selectedGroup!=null&& selectedUser !=null)
+  {
+this.props.client.api('/groups/'+selectedGroup+'/members/$ref').post('{ "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/'+selectedUser+'"}',this.SuccessFailureCallBack);
+  }
+}
+
+//Selection Handler for DropDown
  private _onSelect(event: React.FormEvent<HTMLDivElement>, item?: IDropdownOption):void{
-   alert(item.text)
+   alert(item.text);
  }
  private _onChange = (item: IDropdownOption,index:Number): void => {
   console.log(`Selection change: ${item.text} ${item.selected ? 'selected' : 'unselected'}`);
-  this.setState({selectedGroup:item.key})
+  selectedGroup=item.key;
   
-};
+}
 private _onUserNameChange = (item: IDropdownOption,index:Number): void => {
-  console.log(`Selection change: ${item.text} ${item.selected ? 'selected' : 'unselected'}`);
-  this.setState({selectedUser:item.key})
-};
+  console.log(`Selection change: ${item.key} ${item.selected ? 'selected' : 'unselected'}`);
+ selectedUser=item.key;
+}
 
   public render(): React.ReactElement<IMsTeamsHandlerProps> {
 
-    console.log(dpoptions);
+   // console.log(dpoptions);
     let _usersListColumns = [
       {
         key: 'displayName',
@@ -190,11 +218,12 @@ private _onUserNameChange = (item: IDropdownOption,index:Number): void => {
       <Dropdown
         label="User Names"
         options={this.state.users} 
-       onChanged = {this._onChange}
+       onChanged = {this._onUserNameChange}
         style={ { width: 300 }}
         
          disabled={false}
       />
+     <button value="Add Member" id="btnAddMember" onClick={this.AddMember}>Add Team Member</button>
       </div>
         <DetailsList
                       items={ this.state.groups }
