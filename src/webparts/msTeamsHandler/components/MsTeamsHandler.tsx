@@ -108,11 +108,7 @@ private SuccessFailureCallBack(err:any,response:any,rawresponse?:any)
  // console.log("First : ",err ,"Second ",response,"thirs", rawresponse);
   if(rawresponse!=null && rawresponse.status =="202")
   alert("Created Succesfully");
-  else{
-    console.log("Error:", err, "Response :" ,response, "Rawresponse",rawresponse );
-    alert("Error:Please check the console");
-  }
-  if(rawresponse!=null && rawresponse.status =="204")
+  else if(rawresponse!=null && rawresponse.status =="204")
   alert("Successfully Added");
   else{
     console.log("Error:", err, "Response :" ,response, "Rawresponse",rawresponse );
