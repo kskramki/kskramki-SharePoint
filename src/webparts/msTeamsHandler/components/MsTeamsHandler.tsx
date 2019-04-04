@@ -2,8 +2,6 @@ import * as React from 'react';
 import styles from './MsTeamsHandler.module.scss';
 import { IMsTeamsHandlerProps} from './IMsTeamsHandlerProps';
 import {IMsTeamsHandlerState} from './IMsTeamsHandlerState';
-import { escape } from '@microsoft/sp-lodash-subset';
-import { AadHttpClientFactory } from '@microsoft/sp-http';
 import { IGroupItem,IUserItem } from './IGroupItem';
 import {DetailsList,  DetailsListLayoutMode,CheckboxVisibility,SelectionMode,Dropdown,DropdownMenuItemType,IDropdownOption} from 'office-ui-fabric-react';
 
@@ -23,7 +21,8 @@ export default class MsTeamsHandler extends React.Component<IMsTeamsHandlerProps
   Teamstitle:"",
   groups:[],
   doptions:[],
- users:[]
+ users:[],
+ isHidden:true
  
 
 
@@ -40,14 +39,7 @@ this._onUserNameChange = this._onUserNameChange.bind(this);
   //Compopnent Mount 
 public componentDidMount ()
 {
-//Joine Group  need User.ReadWrite.All permision
- // this.props.client.api("/users/49ba6e73-6df7-441b-98be-8cd747f2c631/joinedTeams").get().then(response=>{
- ////   console.log("Joined Team :",response);
- // });
-  
- //this.props.client.api("/teams").version("beta").post(content,this.SuccessFailureCallBack);
- 
- 
+
  //need User.ReadBasic.All
 this.props.client.api("/users/").get().then(response=>{
   console.log(response);
@@ -83,7 +75,7 @@ if(response['@odata.nextLink']!=null)
 }
 
 //Get all groups in the tenant which is having Teams in group.
-  //V1.0 - /groups?$select=id,resourceProvisioningOptions
+//V1.0 - /groups?$select=id,resourceProvisioningOptions
 //this.props.client.api("/groups?$select=id,resourceProvisioningOptions").get(this.SuccessFailureCallBack);
   private getGroupHavingTeams():void
   {
@@ -153,11 +145,19 @@ this.props.client.api('/groups/'+selectedGroup+'/members/$ref').post('{ "@odata.
  private _onChange = (item: IDropdownOption,index:Number): void => {
   console.log(`Selection change: ${item.text} ${item.selected ? 'selected' : 'unselected'}`);
   selectedGroup=item.key;
+  if(selectedGroup!=null && selectedUser!=null)
+ {
+  this.setState({isHidden:false});
+ }
   
 }
 private _onUserNameChange = (item: IDropdownOption,index:Number): void => {
   console.log(`Selection change: ${item.key} ${item.selected ? 'selected' : 'unselected'}`);
  selectedUser=item.key;
+ if(selectedGroup!=null && selectedUser!=null)
+ {
+  this.setState({isHidden:false});
+ }
 }
 
   public render(): React.ReactElement<IMsTeamsHandlerProps> {
@@ -196,31 +196,45 @@ private _onUserNameChange = (item: IDropdownOption,index:Number): void => {
           </div>
           <div className={ styles.row }>
             <div className={ styles.column }>
-              <a href="https://aka.ms/spfx" className={ styles.button }>
-                <span className={ styles.label }>Check Console logs for  more</span>
-              </a>
+              
+                <span className={ styles.label }>Find below other options</span>
+           
             </div>
           </div>
         </div>
-       <div>
+       <div className={ styles.container }>
+       <div className={ styles.row }>
+         <div className={ styles.column }>
+         <span className={ styles.label }>Group Names(Having Teams)  </span> 
         <Dropdown
-        label="Group Names"
+        
         options={this.state.doptions} 
        onChanged = {this._onChange}
         style={ { width: 300 }}
         
          disabled={false}
       />
+      </div>
+      </div>
+      <div className={ styles.row }>
+       <div className={ styles.column }>
+       <span className={ styles.label }>User Names  </span> 
       <Dropdown
-        label="User Names"
+       
         options={this.state.users} 
        onChanged = {this._onUserNameChange}
         style={ { width: 300 }}
         
          disabled={false}
       />
-     <button value="Add Member" id="btnAddMember" onClick={this.AddMember}>Add Team Member</button>
+     
+     <button disabled={this.state.isHidden}  value="Add Member" id="btnAddMember" onClick={this.AddMember}>Add Team Member</button>
+     </div>
+      
       </div>
+      
+      <div className={ styles.row }>
+       <div className={ styles.column }>
         <DetailsList
                       items={ this.state.groups }
                       columns={ _usersListColumns }
@@ -229,7 +243,11 @@ private _onUserNameChange = (item: IDropdownOption,index:Number): void => {
                       selectionMode={ SelectionMode.none }
                       layoutMode={ DetailsListLayoutMode.fixedColumns }
                       compact={ true }
+                      
                   />
+                  </div>
+        </div>
+        </div>
         </div>
     );
   }

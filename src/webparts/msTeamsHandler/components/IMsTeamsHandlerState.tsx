@@ -8,4 +8,5 @@ doptions:Array<any>;
 users:Array<any>;
 //selectedGroup:string | number;
 //selectedUser:string | number;
+isHidden:boolean;
 }
