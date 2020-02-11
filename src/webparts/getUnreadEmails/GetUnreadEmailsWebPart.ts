@@ -30,12 +30,12 @@ private Gcallback(r:any):void
     this.context.msGraphClientFactory.getClient().then((client:MSGraphClient):void =>{
 var content={"message": {"subject": "Hello Guys!Meet for lunch?", "body": {
       "contentType": "Text",
-      "content": "The new cafeteria is open."
+      "content": "The Training Demo is on."
     },
     "toRecipients": [
       {
         "emailAddress": {
-          "address": "ramcts@ramcts.onmicrosoft.com"
+          "address": "ramakrishnan.kandasamy@cognizant.com"
         }
       }
     ],
@@ -44,31 +44,28 @@ var content={"message": {"subject": "Hello Guys!Meet for lunch?", "body": {
   "saveToSentItems": "false"
 };
 //client.api("/me/mailFolders/AAMkAGMwYjhjOTdkLTk0ZWItNDRlNC1iN2RlLTRiYjE0Y2Y3ZDRhYgAuAAAAAADLNNuaWUwNTYuIOsdOe2FYAQB06bCmaxbCTJXvFWsW58fKAAAAAAEMAAA=/messages").get((error, rawResponse?: any) => {
-  client.api("/users/ram@spcrackers.onmicrosoft.com/sendmail").post(content,this.Gcallback);
+  client.api("/users/ramakrishnan.kandasamy@cognizant.com/sendmail").post(content,this.Gcallback);
   
-    client.api("/users/606e8b6c-36c2-4294-ab69-14944b5764a2/manager").get().then(response=>{
-      console.log("Managere",response);
-      console.log(response.mail);
-    });
-    client.api("/users/606e8b6c-36c2-4294-ab69-14944b5764a2/photo/$value").get().then(response=>{
-      console.log("Managere",response);
-     let  imgblob = response.blob();
-      let imgsrc = window.URL.createObjectURL(imgblob);
-      console.log(imgsrc);
-    });
+    // client.api("/users/606e8b6c-36c2-4294-ab69-14944b5764a2/manager").get().then(response=>{
+    //   console.log("Managere",response);
+    //   console.log(response.mail);
+    // });
+    // client.api("/users/606e8b6c-36c2-4294-ab69-14944b5764a2/photo/$value").get().then(response=>{
+    //   console.log("Managere",response);
+    //  let  imgblob = response.blob();
+    //   let imgsrc = window.URL.createObjectURL(imgblob);
+    //   console.log(imgsrc);
+    // });
   });
     this.domElement.innerHTML = `
       <div class="${ styles.getUnreadEmails }">
         <div class="${ styles.container }">
           <div class="${ styles.row }">
             <div class="${ styles.column }">
-              <span class="${ styles.title }">Welcome to SharePoint!</span>
+              <span class="${ styles.title }">Welcome to Email manipulation webpart!</span>
               <p class="${ styles.subTitle }">Customize SharePoint experiences using Web Parts.</p>
               <p class="${ styles.description }">${escape(this.properties.description)}</p>
-              <a href="https://aka.ms/spfx" class="${ styles.button }">
-                <span class="${ styles.label }">Learn more</span>
-                
-              </a>
+              
             </div>
           </div>
         </div>

@@ -41,7 +41,7 @@ public componentDidMount ()
 {
 
  //need User.ReadBasic.All
-this.props.client.api("/users/").get().then(response=>{
+this.props.client.api("/users/").version('beta').get().then(response=>{
   console.log(response);
  response.value.map((item:any)=>{officeUsers.push({key:item.id,text:item.displayName});});
   if(response['@odata.nextLink']!=null)
